@@ -3,7 +3,7 @@
 
 #define MAX_ERR 1e-10 /* 許容する誤差 */
 
-void MatrixShow(double C[3][3]) {
+void ShowMatrix(double C[3][3]) {
   for (int i = 0; i < 3; i++) {
     printf("{ ");
     for (int j = 0; j < 3; j++) {
@@ -14,27 +14,27 @@ void MatrixShow(double C[3][3]) {
   printf("\n");
 }
 
-void MatrixPlus(double A[3][3], double B[3][3]) {
+void Plus(double A[3][3], double B[3][3]) {
   double C[3][3];
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
       C[i][j] = A[i][j] + B[i][j];
     }
   }
-  MatrixShow(C);
+  ShowMatrix(C);
 }
 
-void MatrixMinus(double A[3][3], double B[3][3]) {
+void Minus(double A[3][3], double B[3][3]) {
   double C[3][3];
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
       C[i][j] = A[i][j] - B[i][j];
     }
   }
-  MatrixShow(C);
+  ShowMatrix(C);
 }
 
-void MatrixCross(double A[3][3], double B[3][3]) {
+void Cross(double A[3][3], double B[3][3]) {
   double C[3][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
@@ -42,10 +42,10 @@ void MatrixCross(double A[3][3], double B[3][3]) {
       // printf("C[%d][%d]:%f\n", i, j, C[i][j]);
     }
   }
-  MatrixShow(C);
+  ShowMatrix(C);
 }
 
-double MatrixDeterminant(double A[3][3]) {
+double Determinant(double A[3][3]) {
   double det_A = A[0][0] * A[1][1] * A[2][2] + A[0][1] * A[1][2] * A[2][0] +
                  A[0][2] * A[1][0] * A[2][1] - A[0][2] * A[1][1] * A[2][0] -
                  A[0][1] * A[1][0] * A[2][2] - A[0][0] * A[1][2] * A[2][1];
@@ -53,8 +53,8 @@ double MatrixDeterminant(double A[3][3]) {
 }
 
 // 余因子で求める
-void MatrixInverse1(double A[3][3]) {
-  double det_A = MatrixDeterminant(A);
+void Inverse1(double A[3][3]) {
+  double det_A = Determinant(A);
   double A_inv[3][3];
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
@@ -78,10 +78,10 @@ void MatrixInverse1(double A[3][3]) {
       }
     }
   }
-  MatrixShow(A_inv);
+  ShowMatrix(A_inv);
 }
 
-void MatrixInverse2(double A[3][3]) {
+void Inverse2(double A[3][3]) {
   double sweep[3][3 * 2];
   double inv_A[3][3];
   for (int i = 0; i < 3; i++) {
@@ -156,29 +156,29 @@ void MatrixInverse2(double A[3][3]) {
     }
   }
   /* 逆行列invを表示 */
-  MatrixShow(inv_A);
+  ShowMatrix(inv_A);
 }
 
 int main() {
   double A[3][3] = {{6.0, 7.0, 3.0}, {8.0, 2.0, 9.0}, {2.0, 6.0, 9.0}};
   double B[3][3] = {{3.0, 3.0, 9.0}, {4.0, 1.0, 3.0}, {8.0, 9.0, 5.0}};
   printf("A:\n");
-  MatrixShow(A);
+  ShowMatrix(A);
   printf("B:\n");
-  MatrixShow(B);
+  ShowMatrix(B);
 
   printf("A+B:\n");
-  MatrixPlus(A, B);
+  Plus(A, B);
 
   printf("A-B:\n");
-  MatrixMinus(A, B);
+  Minus(A, B);
 
   printf("A*B:\n");
-  MatrixCross(A, B);
+  Cross(A, B);
 
   printf("invA1:\n");
-  MatrixInverse1(A);
+  Inverse1(A);
 
   printf("invA2:\n");
-  MatrixInverse2(A);
+  Inverse2(A);
 }
