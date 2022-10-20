@@ -22,7 +22,7 @@ double **CreateMatrix(unsigned int m, unsigned int n) {
   for (i = 0; i < m; i++) {
     /* 1行分ずつメモリを確保する */
     /* n列分のint型のデータが格納できるメモリを確保 */
-    A + i = malloc(sizeof(double) * n);
+    *(A + i) = malloc(sizeof(double) * n);
     if ((A + (sizeof(double *) * i)) == NULL) {
       for (j = 0; j < i; j++) {
         free((A + (sizeof(double *) * i)));
@@ -39,7 +39,7 @@ void ShowMatrix(unsigned int m, unsigned int n, double **A) {
   for (int i = 0; i < m; i++) {
     printf("{ ");
     for (int j = 0; j < n; j++) {
-      printf("%lf ", A[i][j]);
+      printf("%lf ", *(*(A+i)+j));
     }
     printf("}\n");
   }
@@ -50,8 +50,8 @@ void InputMatrix(unsigned int m, unsigned int n, double **A) {
   printf("Matrix: %dx%d\n", m, n);
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < n; j++) {
-      printf("A[%d][%d]:", i, j);
-      scanf("%lf", &A[i][j]);
+      printf("mat[%d][%d]:", i, j);
+      scanf("%lf", (*(A+i)+j));
     }
     printf("\n");
   }
@@ -60,7 +60,7 @@ void InputMatrix(unsigned int m, unsigned int n, double **A) {
 
 void DeleteMatrix(double **A, unsigned int m) {
   for (int i = 0; i < m; i++) {
-    free(A[i]);
+    free(*(A+i));
   }
   free(A);
 }
@@ -69,7 +69,7 @@ void Plus(unsigned int m, unsigned int n, double **A, double **B,
           double **ans) {
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < n; j++) {
-      ans[i][j] = A[i][j] + B[i][j];
+      *(*(ans+i)+j) = *(*(A+i)+j) + *(*(B+i)+j);
     }
   }
   ShowMatrix(m, n, ans);
@@ -79,7 +79,7 @@ void Minus(unsigned int m, unsigned int n, double **A, double **B,
            double **ans) {
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < n; j++) {
-      ans[i][j] = A[i][j] - B[i][j];
+      *(*(ans+i)+j) = *(*(A+i)+j) - *(*(B+i)+j);
     }
   }
   ShowMatrix(m, n, ans);
@@ -89,9 +89,10 @@ void Cross(unsigned int l, unsigned int m, unsigned int n, double **A,
            double **B, double **ans) {
   for (int i = 0; i < l; i++) {
     for (int j = 0; j < n; j++) {
-      ans[i][j] = 0.0;
+      *(*(ans+i)+j) = 0.0;
       for (int k = 0; k < m; k++) {
-        ans[i][j] += A[i][k] * B[k][j];
+        // (*(ans+i)+j) += A[i][k] * B[k][j];
+        *(*(ans+i)+j) += *(*(A+i)+k) * *(*(B+k)+j);
       }
     }
   }
@@ -99,31 +100,31 @@ void Cross(unsigned int l, unsigned int m, unsigned int n, double **A,
 }
 
 void Inverse(unsigned int m, double **A, double **ans) {
-  double sweep[m][m * 2];
+  double** sweep = CreateMatrix(m,2*m);
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < m; j++) {
       /* sweepの左側に逆行列を求める行列をセット */
-      sweep[i][j] = A[i][j];
+      *(*(sweep+i)+j) = *(*(A+i)+j);
       /* sweepの右側に単位行列をセット */
-      sweep[i][m + j] = (i == j) ? 1 : 0;
+      *(*(sweep+i)+m+j) = (i == j) ? 1 : 0;
     }
   }
 
   /* 全ての列の対角成分に対する繰り返し */
   for (int k = 0; k < m; k++) {
     /* 最大の絶対値を注目対角成分の絶対値と仮定 */
-    double max = fabs(sweep[k][k]);
+    double max = fabs(*(*(sweep+k)+m+k));
     int max_i = k;
 
     /* k列目が最大の絶対値となる行を探す */
     for (int i = k + 1; i < m; i++) {
-      if (fabs(sweep[i][k]) > max) {
-        max = fabs(sweep[i][k]);
+      if (fabs(*(*(sweep+i)+k)) > max) {
+        max = fabs(*(*(sweep+i)+k));
         max_i = i;
       }
     }
 
-    if (fabs(sweep[max_i][k]) <= MAX_ERR) {
+    if (fabs(*(*(sweep+max_i)+k)) <= MAX_ERR) {
       /* 逆行列は求められない */
       printf("逆行列は求められません...\n");
       break;
@@ -132,20 +133,20 @@ void Inverse(unsigned int m, double **A, double **ans) {
     /* 操作（１）：k行目とmax_i行目を入れ替える */
     if (k != max_i) {
       for (int j = 0; j < m * 2; j++) {
-        double tmp = sweep[max_i][j];
-        sweep[max_i][j] = sweep[k][j];
-        sweep[k][j] = tmp;
+        double tmp = *(*(sweep+max_i)+j);
+        *(*(sweep+max_i)+j) = *(*(sweep+k)+j);
+        *(*(sweep+k)+j) = tmp;
       }
     }
 
     /* 全ての列の対角成分に対する繰り返し */
     for (int k = 0; k < m; k++) {
       /* sweep[k][k]に掛けると1になる値を求める */
-      double a = 1 / sweep[k][k];
+      double a = 1 / *(*(sweep+k)+k);
       /* 操作（２）：k行目をa倍する */
       for (int j = 0; j < m * 2; j++) {
         /* これによりsweep[k][k]が1になる */
-        sweep[k][j] *= a;
+        *(*(sweep+k)+j) *= a;
       }
       /* 操作（３）によりk行目以外の行のk列目を0にする */
       for (int i = 0; i < m; i++) {
@@ -154,11 +155,11 @@ void Inverse(unsigned int m, double **A, double **ans) {
           continue;
         }
         /* k行目に掛ける値を求める */
-        a = -sweep[i][k];
+        a = -*(*(sweep+i)+k);
         for (int j = 0; j < m * 2; j++) {
           /* i行目にk行目をa倍した行を足す */
           /* これによりsweep[i][k]が0になる */
-          sweep[i][j] += sweep[k][j] * a;
+          *(*(sweep+i)+j) += *(*(sweep+k)+j) * a;
         }
       }
     }
@@ -166,7 +167,7 @@ void Inverse(unsigned int m, double **A, double **ans) {
     /* sweepの右半分がmatの逆行列 */
     for (int i = 0; i < m; i++) {
       for (int j = 0; j < m; j++) {
-        ans[i][j] = sweep[i][m + j];
+        *(*(ans+i)+j) = *(*(sweep+i)+m+j);
       }
     }
   }
