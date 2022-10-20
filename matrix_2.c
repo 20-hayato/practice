@@ -200,4 +200,8 @@ int main() {
 
   printf("invA:\n");
   Inverse(3, A, ans);
+
+  DeleteMatrix(A, 3);
+  DeleteMatrix(B, 3);
+  DeleteMatrix(ans, 3);
 }

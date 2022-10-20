@@ -21,12 +21,11 @@ double **CreateMatrix(unsigned int m, unsigned int n) {
 
   for (i = 0; i < m; i++) {
     /* 1行分ずつメモリを確保する */
-
     /* n列分のint型のデータが格納できるメモリを確保 */
-    A[i] = malloc(sizeof(double) * n);
-    if (A[i] == NULL) {
+    A + i = malloc(sizeof(double) * n);
+    if ((A + (sizeof(double *) * i)) == NULL) {
       for (j = 0; j < i; j++) {
-        free(A[i]);
+        free((A + (sizeof(double *) * i)));
       }
       free(A);
       return NULL;
@@ -200,4 +199,8 @@ int main() {
 
   printf("invA:\n");
   Inverse(3, A, ans);
+
+  DeleteMatrix(A, 3);
+  DeleteMatrix(B, 3);
+  DeleteMatrix(ans, 3);
 }
