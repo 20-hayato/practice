@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define M 10
+#define M 1
 #define K 10
-#define C 10
+#define C 2
 
 double fx(double x, double dx, double u) { return dx; }
 double fdx(double x, double dx, double u) {
@@ -22,7 +22,7 @@ int main() {
 
   double x = 4.0;
   double dx = -7.0;
-  double u = 0.0;
+  double u = 0.0; // 0入力
   double k_x = 0.0;
   double k1_x = 0.0;
   double k2_x = 0.0;
